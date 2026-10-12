@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax check
+        run: python -m py_compile aepb.py
+
+      - name: Download ATT&CK STIX
+        run: |
+          curl -sL -o enterprise-attack.json \
+            https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master/enterprise-attack/enterprise-attack.json
+
+      - name: Run AEPB on APT29
+        run: python aepb.py --group "APT29" -o /tmp/apt29_plan.md
+
+      - name: Verify output
+        run: |
+          test -s /tmp/apt29_plan.md
+          head -5 /tmp/apt29_plan.md

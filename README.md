@@ -1,7 +1,7 @@
 # Adversary Emulation Plan Builder (AEPB)
 
 Generate lab-ready adversary emulation plans from MITRE ATT&CK.
-
+![CI](https://github.com/sahilrahman378-hub/adversary-emulation-plan-builder/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
