@@ -8,6 +8,7 @@ any technique against any system.
 """
 import argparse
 import json
+import re
 from pathlib import Path
 from datetime import date
 
@@ -20,7 +21,9 @@ TACTIC_ORDER = [
     "execution",
     "persistence",
     "privilege-escalation",
+    "stealth",
     "defense-evasion",
+    "defense-impairment",
     "credential-access",
     "discovery",
     "lateral-movement",
@@ -29,6 +32,11 @@ TACTIC_ORDER = [
     "exfiltration",
     "impact",
 ]
+
+
+def safe_filename(name):
+    """Convert a group name into a safe filename."""
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", name).strip("_")
 
 
 def load_stix(path):
@@ -138,14 +146,18 @@ def main():
     p = argparse.ArgumentParser(
         description="Adversary Emulation Plan Builder (authorized lab use only)"
     )
-    p.add_argument("--group", required=True, help="e.g. APT29, FIN7, Lazarus")
+    p.add_argument("--group", required=True, help="e.g. APT29, FIN7, Lazarus Group")
     p.add_argument("--stix", default=str(STIX_FILE), help="Path to enterprise-attack.json")
     p.add_argument("-o", "--output", default=None, help="Output markdown path")
     args = p.parse_args()
 
     plan = build_plan(args.group, Path(args.stix))
 
-    out = Path(args.output) if args.output else Path(f"{args.group.lower()}_plan.md")
+    if args.output:
+        out = Path(args.output)
+    else:
+        out = Path(f"{safe_filename(args.group)}_plan.md")
+
     out.write_text(plan, encoding="utf-8")
     print(f"[+] Wrote {out} ({len(plan.splitlines())} lines)")
 
